@@ -1,7 +1,8 @@
 
 from tkinter import *
 from functools import partial
-
+import requests
+import jwt
 
 root = Tk()
 root.title("Toribio's POS")
@@ -11,13 +12,23 @@ width = root.winfo_screenwidth()
 height = root.winfo_screenheight()
 root.geometry("%dx%d" % (width, height))
 
-def validateLogin(name, password):
-    global username 
-    print("username entered :", name.get())
-    print("password entered :", password.get())
-    username = name.get()
-    loggedIn = LabelFrame(root, text="Hello " + username + " you are loggedIn", font=("Arial", 35))
-    loggedIn.pack(fill='both', expand=1)
+def validateLogin(email, password):
+    username = email.get()
+    passw = password.get()
+    response = requests.get("http://localhost:8080/api/sign/in",{
+        "email": username,
+        "password": passw
+    })
+    print(response.status_code)
+    response_name = response.json()
+    if response.status_code == 200:
+        print(response_name)
+    elif response.status_code == 206:
+        print(response_name["error"])
+        print("Invalid")
+
+    # loggedIn = LabelFrame(root, text="Hello " + response_name["name"] + " you are loggedIn", font=("Arial", 35))
+    # loggedIn.pack(fill='both', expand=1)
     sign_in_main_frame.forget()
     return 
 
